@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coommi Run</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1a1a24;--surface3:#22222e;--border:#2a2a3a;--text:#e8e8f0;--text2:#9898a8;--text3:#686878;--accent:#ff5c35;--accent2:#ff7b5a;--accent-glow:rgba(255,92,53,.15);--green:#2dd4a0;--green-dim:rgba(45,212,160,.12);--blue:#5b8cff;--blue-dim:rgba(91,140,255,.12);--yellow:#fbbf24;--yellow-dim:rgba(251,191,36,.12);--purple:#a78bfa;--purple-dim:rgba(167,139,250,.12);--pink:#f472b6;--pink-dim:rgba(244,114,182,.12);--cyan:#38bdf8;--cyan-dim:rgba(56,189,248,.12);--radius:14px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR','Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.bg-orb{position:fixed;width:600px;height:600px;border-radius:50%;filter:blur(150px);opacity:.07;pointer-events:none;z-index:0}
+.bg-orb-1{top:-200px;right:-100px;background:var(--accent)}.bg-orb-2{bottom:-200px;left:-100px;background:var(--blue)}
+.header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:12px;font-family:'Outfit',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px;cursor:pointer}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#ff9060);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo em{color:var(--accent);font-style:normal}
+.header-right{display:flex;gap:8px;align-items:center}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#e04420);color:#fff;box-shadow:0 2px 16px rgba(255,92,53,.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,92,53,.35)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-full{width:100%;padding:14px;font-size:15px}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost{background:none;border:none;color:var(--text2);cursor:pointer;font-family:inherit;font-size:13px;display:flex;align-items:center;gap:4px}
+.btn-ghost:hover{color:var(--accent)}
+.btn-icon{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;padding:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);cursor:pointer;font-size:14px;transition:.2s}
+.btn-icon:hover{color:var(--accent);border-color:var(--accent)}
+.container{max-width:920px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+.admin-container{max-width:1100px}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 64px);padding:20px}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:44px 36px;max-width:420px;width:100%;text-align:center;position:relative;overflow:hidden}
+.login-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,var(--accent-glow),transparent 70%);pointer-events:none}
+.login-card h2{font-family:'Outfit';font-size:28px;font-weight:800;margin-bottom:4px}
+.login-card .sub{color:var(--text2);font-size:14px;margin-bottom:32px}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;color:var(--text);font-family:'Outfit';font-size:18px;font-weight:600;outline:none;transition:.2s;text-align:center;letter-spacing:3px;margin-bottom:6px}
+.login-input:focus{border-color:var(--accent)}
+.login-input::placeholder{letter-spacing:0;font-weight:400;font-family:'Noto Sans KR';font-size:14px;color:var(--text3)}
+.login-error{color:#ff4444;font-size:13px;min-height:22px;margin-bottom:10px}
+.login-divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--text3);font-size:12px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.profile-card{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:24px;position:relative;overflow:hidden}
+.profile-card::before{content:'';position:absolute;top:0;right:0;width:200px;height:200px;background:radial-gradient(circle,var(--accent-glow),transparent 70%);pointer-events:none}
+.profile-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.profile-info{display:flex;align-items:center;gap:16px}
+.avatar{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:'Outfit';color:#fff;flex-shrink:0}
+.profile-name{font-size:22px;font-weight:700}
+.profile-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.profile-stats{display:flex;gap:14px;position:relative;z-index:1;flex-wrap:wrap}
+.stat-pill{text-align:center;padding:8px 14px;background:var(--surface3);border-radius:var(--radius-sm);min-width:72px}
+.stat-value{font-family:'Outfit';font-weight:700;font-size:20px;color:var(--accent2)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+.input-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+.input-section h3{font-size:14px;color:var(--text2);margin-bottom:14px;font-weight:500}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.input-group{display:flex;flex-direction:column;gap:5px}
+.input-group label{font-size:12px;color:var(--text3);font-weight:500}
+.input-group input,.input-group select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:.2s}
+.input-group input:focus,.input-group select:focus{border-color:var(--accent)}
+.input-group select option{background:var(--surface2)}
+.month-section{margin-bottom:28px}
+.month-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-title{font-family:'Outfit';font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.month-badge{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600;font-family:'Outfit'}
+.badge-green{background:var(--green-dim);color:var(--green)}.badge-blue{background:var(--blue-dim);color:var(--blue)}
+.week-table{width:100%;border-collapse:separate;border-spacing:0 4px}
+.week-table th{text-align:left;font-size:11px;color:var(--text3);font-weight:500;padding:6px 12px;text-transform:uppercase;letter-spacing:.5px}
+.week-table td{padding:10px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.week-table td:first-child{border-left:1px solid var(--border);border-radius:var(--radius-sm) 0 0 var(--radius-sm)}
+.week-table td:last-child{border-right:1px solid var(--border);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.week-label{font-weight:600;color:var(--text);font-family:'Outfit'}
+.check-done{color:var(--green);font-size:12px}.check-empty{color:var(--text3);font-size:12px}
+.distance-cell{font-family:'Outfit';font-weight:600;color:var(--accent2)}.distance-empty{color:var(--text3)}
+.progress-bar-bg{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease}
+.sync-bar{position:fixed;top:64px;left:0;right:0;z-index:99;height:3px;background:transparent;pointer-events:none}
+.sync-bar.loading{background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:syncPulse 1.2s infinite}
+@keyframes syncPulse{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+.sync-status{position:fixed;top:72px;right:20px;z-index:99;font-size:11px;padding:4px 10px;border-radius:12px;display:none;font-weight:500}
+.sync-status.show{display:block}
+.sync-ok{background:var(--green-dim);color:var(--green)}
+.sync-err{background:rgba(255,68,68,.12);color:#ff4444}
+.admin-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.admin-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+.admin-stat-icon{font-size:24px;margin-bottom:8px}
+.admin-stat-value{font-family:'Outfit';font-size:28px;font-weight:800}
+.admin-stat-label{font-size:12px;color:var(--text3);margin-top:4px}
+.admin-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+.admin-table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.admin-table-header h3{font-size:15px;font-weight:600}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{text-align:left;font-size:11px;color:var(--text3);font-weight:500;padding:10px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.admin-table td{padding:11px 12px;font-size:13px;border-bottom:1px solid rgba(42,42,58,.5)}
+.admin-table tr:hover td{background:var(--surface2)}
+.student-name-cell{display:flex;align-items:center;gap:10px}
+.mini-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;font-family:'Outfit';flex-shrink:0}
+.grade-badge{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.grade-6{background:var(--yellow-dim);color:var(--yellow)}.grade-7{background:var(--blue-dim);color:var(--blue)}.grade-8{background:var(--green-dim);color:var(--green)}.grade-9{background:var(--purple-dim);color:var(--purple)}.grade-10{background:var(--pink-dim);color:var(--pink)}.grade-11{background:var(--cyan-dim);color:var(--cyan)}
+.inline-progress{display:flex;align-items:center;gap:8px}.inline-progress-bar{flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;min-width:60px}.inline-progress-fill{height:100%;border-radius:3px;transition:width .4s}.inline-progress-text{font-family:'Outfit';font-size:12px;font-weight:600;min-width:36px;text-align:right}
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;transition:.2s;font-family:inherit}.filter-chip.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}.filter-chip:hover{border-color:var(--accent)}
+.search-input{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;color:var(--text);font-family:inherit;font-size:12px;outline:none;width:180px;transition:.2s}.search-input:focus{border-color:var(--accent)}
+.sel-filter{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 12px;color:var(--text2);font-family:inherit;font-size:12px;cursor:pointer;outline:none}
+.chart-container{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+.chart-container h3{font-size:15px;font-weight:600;margin-bottom:16px}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:160px;padding:0 8px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s;position:relative;cursor:pointer}
+.chart-bar:hover::after{content:attr(data-value);position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;font-family:'Outfit';color:var(--text);background:var(--surface3);padding:2px 8px;border-radius:4px;white-space:nowrap;z-index:5}
+.chart-label{font-size:10px;color:var(--text3)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 20px;font-size:13px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .3s;z-index:200;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:480px;width:100%;transform:scale(.95);transition:transform .25s}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal h3{font-size:18px;margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease forwards}
+.d1{animation-delay:.05s;opacity:0}.d2{animation-delay:.1s;opacity:0}.d3{animation-delay:.15s;opacity:0}.d4{animation-delay:.2s;opacity:0}
+.group-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px}
+.group-card{background:var(--surface2);border-radius:var(--radius-sm);padding:16px;text-align:center}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:640px){.header{padding:0 14px}.container{padding:16px 12px 60px}.profile-stats{gap:8px}.stat-pill{padding:6px 10px}.stat-value{font-size:17px}.admin-stats-grid{grid-template-columns:repeat(2,1fr)}.input-row{grid-template-columns:1fr}.profile-header{flex-direction:column;align-items:flex-start}.search-input{width:100%}.login-card{padding:28px 20px}}
+</style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<header class="header">
+  <div class="logo" onclick="logout()"><div class="logo-icon">🏃</div>Coommi <em>Run</em></div>
+  <div class="header-right" id="hr"></div>
+</header>
+<div class="sync-bar" id="syncBar"></div>
+<div class="sync-status" id="syncStatus"></div>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="mo"><div class="modal" id="mc"></div></div>
+<script>
+// =====================================================
+// ⚠️ 아래 URL을 Google Apps Script 웹앱 URL로 교체하세요!
+const API_URL = 'https://script.google.com/macros/s/AKfycbxofVK8ZBQQpqsUi6qJctMAw4FxVi1s7qgW7ipwHxMWGpy7XLVJFjrGwsBFUVxYieI8/exec';
+// =====================================================
+const GOAL=140,APIN='0410';
+const MO=[{m:3,l:'3월',w:['3-1주','3-2주','3-3주','3-4주','3-5주']},{m:4,l:'4월',w:['4-1주','4-2주','4-3주','4-4주']},{m:5,l:'5월',w:['5-1주','5-2주','5-3주','5-4주']},{m:6,l:'6월',w:['6-1주','6-2주','6-3주','6-4주','6-5주']},{m:7,l:'7월',w:['7-1주','7-2주','7-3주','7-4주','7-5주']},{m:8,l:'8월',w:['8-1주','8-2주','8-3주','8-4주']},{m:9,l:'9월',w:['9-1주','9-2주','9-3주','9-4주']},{m:10,l:'10월',w:['10-1주','10-2주','10-3주','10-4주']}];
+const ET=['러닝 완료','기타 운동','인터벌','조깅','스트레칭','근력 운동','휴식'];
+const CC={'소망꿈':'#fbbf24','믿음꿈':'#5b8cff','지혜꿈':'#2dd4a0','온유꿈':'#a78bfa','진리꿈':'#f472b6','평화':'#38bdf8'};
+const CL=['소망꿈','믿음꿈','지혜꿈','온유꿈','진리꿈','평화'];
+const BC=['#fbbf24','#5b8cff','#2dd4a0','#a78bfa','#f472b6','#38bdf8','#ff5c35','#ff9060'];
+const RS=[
+{s:'2020121',n:'강로히',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2019001',n:'강소율',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2017121',n:'강율',g:9,c:'온유꿈',x:'남',t:'한승대'},{s:'2017109',n:'강이레',g:9,c:'온유꿈',x:'남',t:'한승대'},{s:'2019122',n:'고운',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2020001',n:'김가은',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2020002',n:'김민',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2018003',n:'김서진',g:8,c:'지혜꿈',x:'남',t:'강윤화'},{s:'2019004',n:'김시은',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2018127',n:'김예인',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2019130',n:'김윤아',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2018006',n:'김지윤',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2018119',n:'김태민',g:8,c:'지혜꿈',x:'남',t:'강윤화'},{s:'2019121',n:'김태율',g:7,c:'믿음꿈',x:'남',t:'오호진'},{s:'2017112',n:'김하연',g:9,c:'온유꿈',x:'여',t:'한승대'},{s:'2019128',n:'김하진',g:7,c:'믿음꿈',x:'남',t:'오호진'},{s:'2017120',n:'김하현',g:9,c:'온유꿈',x:'여',t:'한승대'},{s:'2018116',n:'김현아',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2019117',n:'박건우',g:7,c:'믿음꿈',x:'남',t:'오호진'},{s:'2019109',n:'박도윤',g:7,c:'믿음꿈',x:'남',t:'오호진'},{s:'2017002',n:'박설아',g:9,c:'온유꿈',x:'여',t:'한승대'},{s:'2018128',n:'박시아',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2020003',n:'박시온',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2018129',n:'배하은',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2020114',n:'백서윤',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2017110',n:'백성재',g:9,c:'온유꿈',x:'남',t:'한승대'},{s:'2017106',n:'서동휘',g:9,c:'온유꿈',x:'남',t:'한승대'},{s:'2017115',n:'손태현',g:9,c:'온유꿈',x:'남',t:'한승대'},{s:'2018112',n:'송태율',g:8,c:'지혜꿈',x:'남',t:'강윤화'},{s:'2020005',n:'신재민',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2020007',n:'안찬영',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2020008',n:'양은유',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2018123',n:'엄연준',g:8,c:'지혜꿈',x:'남',t:'강윤화'},{s:'2020123',n:'오선율',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2018126',n:'오은율',g:8,c:'지혜꿈',x:'남',t:'강윤화'},{s:'2017117',n:'오은혜',g:9,c:'온유꿈',x:'여',t:'한승대'},{s:'2019118',n:'유지성',g:7,c:'믿음꿈',x:'남',t:'오호진'},{s:'2020115',n:'이김하경',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2020116',n:'이사랑',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2019005',n:'이시온',g:7,c:'믿음꿈',x:'남',t:'오호진'},{s:'2018008',n:'이원선',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2019007',n:'이지영',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2020009',n:'이하은',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2020010',n:'임선규',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2019008',n:'임유빈',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2017003',n:'임주은',g:9,c:'온유꿈',x:'여',t:'한승대'},{s:'2018009',n:'정은율',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2018010',n:'주서린',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2018011',n:'주아린',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2019113',n:'최단비',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2017107',n:'최서린',g:9,c:'온유꿈',x:'여',t:'한승대'},{s:'2020012',n:'최선우',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2017114',n:'홍이든',g:9,c:'온유꿈',x:'남',t:'한승대'},{s:'2019129',n:'홍이레',g:7,c:'믿음꿈',x:'여',t:'오호진'},{s:'2020120',n:'황라온',g:6,c:'소망꿈',x:'남',t:'박예슬'},{s:'2018125',n:'황세희',g:8,c:'지혜꿈',x:'여',t:'강윤화'},{s:'2020122',n:'황이레',g:6,c:'소망꿈',x:'여',t:'박예슬'},{s:'2015001',n:'권나영',g:11,c:'평화',x:'여',t:'권미진'},{s:'2016111',n:'김은찬',g:10,c:'진리꿈',x:'남',t:'박주영'},{s:'2015108',n:'손태성',g:11,c:'평화',x:'남',t:'권미진'},{s:'2016119',n:'신정우',g:10,c:'진리꿈',x:'남',t:'박주영'},{s:'2015111',n:'안소혜',g:11,c:'평화',x:'여',t:'권미진'},{s:'2016004',n:'안정원',g:10,c:'진리꿈',x:'남',t:'박주영'},{s:'2016006',n:'최시율',g:10,c:'진리꿈',x:'남',t:'박주영'},{s:'2016007',n:'최시은',g:10,c:'진리꿈',x:'여',t:'박주영'},{s:'2016121',n:'최유주',g:10,c:'진리꿈',x:'여',t:'박주영'},{s:'2016114',n:'현다니엘',g:10,c:'진리꿈',x:'남',t:'박주영'},{s:'2015110',n:'황하영',g:11,c:'평화',x:'남',t:'권미진'}
+];
+let DB={},MODE='login',LI=null;
+function initDB(){const db={};RS.forEach(r=>{db[r.s]={p:'',gr:'',w:{}}});return db}
+const fs=s=>RS.find(r=>r.s===s);
+const rc=s=>(DB[s]||(DB[s]={p:'',gr:'',w:{}}));
+const dt=s=>Object.values(rc(s).w).reduce((a,w)=>a+(w.d||0),0);
+const wc=s=>Object.keys(rc(s).w).length;
+const pr=s=>Math.min(Math.round(dt(s)/GOAL*100),100);
+const aw=()=>MO.flatMap(m=>m.w);
+function showSync(on){document.getElementById('syncBar').className=on?'sync-bar loading':'sync-bar'}
+function showSyncMsg(ok,msg){const el=document.getElementById('syncStatus');el.textContent=msg;el.className='sync-status show '+(ok?'sync-ok':'sync-err');setTimeout(()=>el.classList.remove('show'),2500)}
+function apiOk(){return API_URL&&API_URL.length>10}
+async function apiCall(params){if(!apiOk())return null;showSync(true);try{const url=new URL(API_URL);Object.keys(params).forEach(k=>url.searchParams.set(k,params[k]));const r=await fetch(url.toString(),{redirect:'follow'});const j=await r.json();showSync(false);return j}catch(e){showSync(false);showSyncMsg(false,'동기화 실패');return null}}
+async function loadFromSheet(){if(!apiOk()){DB=initDB();return}showSync(true);const res=await apiCall({action:'read'});DB=initDB();if(res&&res.data){res.data.forEach(row=>{const sid=String(row.sid);if(!DB[sid])DB[sid]={p:'',gr:'',w:{}};if(row.week==='_meta'){DB[sid].p=row.paps||'';DB[sid].gr=row.group||''}else if(row.week){DB[sid].w[row.week]={e1:row.ex1||'',e2:row.ex2||'',d:Number(row.distance)||0};if(row.paps)DB[sid].p=row.paps;if(row.group)DB[sid].gr=row.group}});showSyncMsg(true,'✓ 동기화 완료')}showSync(false)}
+async function saveRecordToSheet(sid,week,e1,e2,dist,paps,group){if(!apiOk())return;await apiCall({action:'write',data:JSON.stringify({sid,week,ex1:e1,ex2:e2,distance:dist,paps:paps||'',group:group||''})});showSyncMsg(true,'✓ 저장됨')}
+async function deleteFromSheet(sid,week){if(!apiOk())return;await apiCall({action:'delete',sid,week});showSyncMsg(true,'✓ 삭제됨')}
+async function saveMetaToSheet(sid,paps,group){if(!apiOk())return;await apiCall({action:'meta',data:JSON.stringify({sid,paps,group})});showSyncMsg(true,'✓ 저장됨')}
+function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function om(h){document.getElementById('mc').innerHTML=h;document.getElementById('mo').classList.add('show')}
+function cm(){document.getElementById('mo').classList.remove('show')}
+document.getElementById('mo').onclick=e=>{if(e.target===e.currentTarget)cm()};
+function render(){const hr=document.getElementById('hr');if(MODE==='login'){hr.innerHTML='';rLogin()}else if(MODE==='student'){const st=fs(LI);hr.innerHTML='<span style="font-size:13px;color:var(--text2)"><strong style="color:var(--text)">'+st.n+'</strong> <span style="font-family:Outfit;color:var(--text3)">'+st.s+'</span></span>'+(apiOk()?'<button class="btn-ghost" onclick="refresh()">🔄</button>':'')+'<button class="btn-ghost" onclick="logout()">로그아웃</button>';rStudent()}else if(MODE==='admin'){hr.innerHTML='<div style="font-size:13px;color:var(--accent);font-weight:600">🔐 관리자</div>'+(apiOk()?'<button class="btn-ghost" onclick="refresh()">🔄</button>':'')+'<button class="btn-ghost" onclick="logout()">로그아웃</button>';rAdmin()}}
+async function refresh(){toast('🔄 데이터 불러오는 중...');await loadFromSheet();render()}
+function rLogin(){const noApi=!apiOk();document.getElementById('app').innerHTML='<div class="login-wrap"><div class="login-card fade-up"><div style="font-size:48px;margin-bottom:16px">🏃‍♂️</div><h2>Coommi Run</h2><div class="sub">학번을 입력하여 로그인하세요</div>'+(noApi?'<div style="background:rgba(255,92,53,.08);border:1px solid rgba(255,92,53,.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:20px;font-size:12px;color:var(--accent2);text-align:left">⚠️ <strong>API 미설정</strong> — 현재 오프라인 모드입니다.<br>데이터가 이 브라우저에만 저장됩니다.<br><span style="color:var(--text3)">설정 가이드를 참고하여 Google Sheets를 연동하세요.</span></div>':'')+'<input class="login-input" id="lid" placeholder="학번 입력 (예: 2020121)" maxlength="7" onkeydown="if(event.key===\'Enter\')doL()" autofocus /><div class="login-error" id="le"></div><button class="btn btn-primary btn-full" onclick="doL()" id="loginBtn">로그인</button><div class="login-divider">또는</div><button class="btn btn-secondary btn-full" onclick="showAL()">🔐 관리자 로그인</button></div></div>';setTimeout(()=>{const e=document.getElementById('lid');if(e)e.focus()},100)}
+async function doL(){const v=document.getElementById('lid').value.trim();const st=RS.find(r=>r.s===v);if(!st){document.getElementById('le').textContent='등록되지 않은 학번입니다';return}document.getElementById('loginBtn').disabled=true;document.getElementById('loginBtn').innerHTML='<span class="spinner"></span>로그인 중...';if(apiOk())await loadFromSheet();LI=v;MODE='student';render();toast('✅ '+st.n+'님, 환영합니다!')}
+function showAL(){om('<h3>🔐 관리자 로그인</h3><div class="input-group" style="margin-bottom:12px"><label>비밀번호</label><input id="ap" type="password" placeholder="비밀번호 입력" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:inherit;font-size:14px;outline:none;width:100%" onkeydown="if(event.key===\'Enter\')doAL()" /></div><div id="ae" style="color:#ff4444;font-size:13px;min-height:20px"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="cm()">취소</button><button class="btn btn-primary" id="adminBtn" onclick="doAL()">로그인</button></div>');setTimeout(()=>{const e=document.getElementById('ap');if(e)e.focus()},200)}
+async function doAL(){if(document.getElementById('ap').value!==APIN){document.getElementById('ae').textContent='비밀번호가 올바르지 않습니다';return}document.getElementById('adminBtn').disabled=true;document.getElementById('adminBtn').innerHTML='<span class="spinner"></span>';if(apiOk())await loadFromSheet();MODE='admin';LI=null;cm();render();toast('✅ 관리자 모드')}
+function logout(){MODE='login';LI=null;render()}
+function rStudent(){const sid=LI,st=fs(sid),r=rc(sid),d=dt(sid),w=wc(sid),p=pr(sid),clr=CC[st.c]||'var(--accent)';document.getElementById('app').innerHTML='<div class="container"><div class="profile-card fade-up"><div class="profile-header"><div class="profile-info"><div class="avatar" style="background:linear-gradient(135deg,'+clr+','+clr+'99)">'+st.n[0]+'</div><div><div class="profile-name">'+st.n+' <span style="font-size:14px;color:var(--text3);font-weight:400;font-family:Outfit">'+st.s+'</span></div><div class="profile-sub">'+st.g+'학년 '+st.c+' · 담임 '+st.t+(r.p?' · PAPS '+r.p:'')+(r.gr?' · '+r.gr:'')+'</div></div></div><div class="profile-stats"><div class="stat-pill"><div class="stat-value">'+d.toFixed(1)+'<span style="font-size:13px">km</span></div><div class="stat-label">총 거리</div></div><div class="stat-pill"><div class="stat-value">'+w+'<span style="font-size:13px">주</span></div><div class="stat-label">완료</div></div><div class="stat-pill"><div class="stat-value">'+p+'<span style="font-size:13px">%</span></div><div class="stat-label">달성률</div></div></div></div><div class="progress-bar-bg" style="margin-top:20px;height:8px"><div class="progress-bar-fill" style="width:'+p+'%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:11px;color:var(--text3)">0km</span><span style="font-size:11px;color:var(--accent);font-weight:600">'+d.toFixed(1)+'km / '+GOAL+'km</span></div></div><div class="input-section fade-up d1"><h3>⚙️ 내 정보 설정</h3><div class="input-row"><div class="input-group"><label>PAPS 왕복오래달리기 등급</label><select id="mp" onchange="sM()">'+['','1등급','2등급','3등급','4등급','5등급'].map(function(g){return '<option value="'+g+'" '+(r.p===g?'selected':'')+'>'+(g||'선택안함')+'</option>'}).join('')+'</select></div><div class="input-group"><label>훈련 조</label><select id="mg" onchange="sM()">'+['','A조','B조','C조','D조','E조'].map(function(g){return '<option value="'+g+'" '+(r.gr===g?'selected':'')+'>'+(g||'선택안함')+'</option>'}).join('')+'</select></div></div></div><div class="input-section fade-up d2"><h3>📝 이번 주 기록 입력</h3><div class="input-row"><div class="input-group"><label>주차</label><select id="rw">'+aw().map(function(w2){return '<option value="'+w2+'">'+w2+'</option>'}).join('')+'</select></div><div class="input-group"><label>총 달린 거리 (km)</label><input id="rd" type="number" step="0.1" min="0" placeholder="예: 3.5" /></div></div><div class="input-row"><div class="input-group"><label>운동 1회</label><select id="re1"><option value="">선택안함</option>'+ET.map(function(e){return '<option>'+e+'</option>'}).join('')+'</select></div><div class="input-group"><label>운동 2회</label><select id="re2"><option value="">선택안함</option>'+ET.map(function(e){return '<option>'+e+'</option>'}).join('')+'</select></div></div><button class="btn btn-primary" onclick="sR()" id="saveBtn">기록 저장</button></div>'+MO.map(function(m,mi){var mw=m.w.map(function(w2){return{w:w2,d:r.w[w2]||null}});var md=mw.reduce(function(a,v){return a+(v.d?v.d.d:0)},0);var fl=mw.filter(function(v){return v.d}).length;return '<div class="month-section fade-up d'+Math.min(mi+3,4)+'"><div class="month-header"><div class="month-title">'+m.l+(fl>0?' <span class="month-badge '+(fl===m.w.length?'badge-green':'badge-blue')+'">'+fl+'/'+m.w.length+'주</span>':'')+'</div>'+(md>0?'<span style="font-family:Outfit;font-size:14px;font-weight:700;color:var(--accent2)">'+md.toFixed(1)+'km</span>':'')+'</div><table class="week-table"><thead><tr><th>주차</th><th>운동 1회</th><th>운동 2회</th><th>거리</th><th></th></tr></thead><tbody>'+mw.map(function(v){return '<tr><td><span class="week-label">'+v.w+'</span></td><td>'+(v.d&&v.d.e1?'<span class="check-done">✓ '+v.d.e1+'</span>':'<span class="check-empty">—</span>')+'</td><td>'+(v.d&&v.d.e2?'<span class="check-done">✓ '+v.d.e2+'</span>':'<span class="check-empty">—</span>')+'</td><td>'+(v.d?'<span class="distance-cell">'+v.d.d+'km</span>':'<span class="distance-empty">—</span>')+'</td><td>'+(v.d?'<button class="btn-icon" onclick="dR(\''+v.w+'\')">✕</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div>'}).join('')+'</div>'}
+async function sM(){var p=document.getElementById('mp').value,g=document.getElementById('mg').value;rc(LI).p=p;rc(LI).gr=g;await saveMetaToSheet(LI,p,g);toast('✅ 저장됨')}
+async function sR(){var w=document.getElementById('rw').value,d=parseFloat(document.getElementById('rd').value)||0,e1=document.getElementById('re1').value,e2=document.getElementById('re2').value;if(d<=0&&!e1){toast('⚠️ 운동 또는 거리를 입력하세요');return}var btn=document.getElementById('saveBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>저장 중...';rc(LI).w[w]={e1:e1,e2:e2,d:d};await saveRecordToSheet(LI,w,e1,e2,d,rc(LI).p,rc(LI).gr);toast('✅ '+w+' 저장');render()}
+async function dR(w){delete rc(LI).w[w];await deleteFromSheet(LI,w);toast('🗑️ 삭제');render()}
+var AF={c:'all',g:'all',q:'',so:'name'};
+function rAdmin(){var all=RS,tot=all.length;var avgD=tot?(all.reduce(function(a,s){return a+dt(s.s)},0)/tot).toFixed(1):0;var done=all.filter(function(s){return dt(s.s)>=GOAL}).length;var totR=all.reduce(function(a,s){return a+wc(s.s)},0);var f=all.slice();if(AF.c!=='all')f=f.filter(function(s){return s.c===AF.c});if(AF.g!=='all')f=f.filter(function(s){return s.g===+AF.g});if(AF.q)f=f.filter(function(s){return s.n.includes(AF.q)||s.s.includes(AF.q)});if(AF.so==='distance')f.sort(function(a,b){return dt(b.s)-dt(a.s)});else if(AF.so==='progress')f.sort(function(a,b){return pr(b.s)-pr(a.s)});else if(AF.so==='weeks')f.sort(function(a,b){return wc(b.s)-wc(a.s)});else if(AF.so==='grade')f.sort(function(a,b){return a.g-b.g||a.n.localeCompare(b.n,'ko')});else f.sort(function(a,b){return a.n.localeCompare(b.n,'ko')});var cd=MO.map(function(m){var t=0;all.forEach(function(s){m.w.forEach(function(w){var r2=rc(s.s).w[w];if(r2)t+=r2.d||0})});return{l:m.l,v:tot?(t/tot).toFixed(1):0}});var mx=Math.max.apply(null,cd.map(function(d){return +d.v}).concat([1]));document.getElementById('app').innerHTML='<div class="container admin-container"><h2 style="font-family:Outfit;font-weight:800;font-size:24px;margin-bottom:20px" class="fade-up">📊 관리자 대시보드</h2><div class="admin-stats-grid fade-up d1"><div class="admin-stat-card"><div class="admin-stat-icon">👥</div><div class="admin-stat-value">'+tot+'</div><div class="admin-stat-label">전체 학생</div></div><div class="admin-stat-card"><div class="admin-stat-value" style="color:var(--accent2)">'+avgD+'<span style="font-size:16px">km</span></div><div class="admin-stat-label">평균 거리</div></div><div class="admin-stat-card"><div class="admin-stat-icon">🏅</div><div class="admin-stat-value" style="color:var(--green)">'+done+'</div><div class="admin-stat-label">'+GOAL+'K 달성</div></div><div class="admin-stat-card"><div class="admin-stat-value" style="color:var(--blue)">'+totR+'</div><div class="admin-stat-label">총 기록 수</div></div></div><div class="chart-container fade-up d2"><h3>월별 평균 달린 거리</h3><div class="chart-bars">'+cd.map(function(d,i){return '<div class="chart-bar-wrap"><div class="chart-bar" data-value="'+d.v+'km" style="height:'+(mx>0?(+d.v/mx*100):0)+'%;background:linear-gradient(180deg,'+BC[i%BC.length]+','+BC[i%BC.length]+'88)"></div><span class="chart-label">'+d.l+'</span></div>'}).join('')+'</div></div><div class="filter-bar fade-up d3"><input class="search-input" placeholder="이름 또는 학번 검색..." value="'+AF.q+'" oninput="AF.q=this.value;rAdmin()"><button class="filter-chip '+(AF.c==='all'?'active':'')+'" onclick="AF.c=\'all\';rAdmin()">전체 반</button>'+CL.map(function(c){return '<button class="filter-chip '+(AF.c===c?'active':'')+'" onclick="AF.c=\''+c+'\';rAdmin()">'+c+'</button>'}).join('')+'<select class="sel-filter" onchange="AF.g=this.value;rAdmin()"><option value="all" '+(AF.g==='all'?'selected':'')+'>전체 학년</option>'+[6,7,8,9,10,11].map(function(g2){return '<option value="'+g2+'" '+(AF.g==g2?'selected':'')+'>'+g2+'학년</option>'}).join('')+'</select><select class="sel-filter" onchange="AF.so=this.value;rAdmin()"><option value="name" '+(AF.so==='name'?'selected':'')+'>이름순</option><option value="grade" '+(AF.so==='grade'?'selected':'')+'>학년순</option><option value="distance" '+(AF.so==='distance'?'selected':'')+'>거리순</option><option value="progress" '+(AF.so==='progress'?'selected':'')+'>달성률순</option><option value="weeks" '+(AF.so==='weeks'?'selected':'')+'>기록 수</option></select></div><div class="admin-table-wrap fade-up d4"><div class="admin-table-header"><h3>학생 목록 ('+f.length+'명)</h3></div><div style="overflow-x:auto"><table class="admin-table"><thead><tr><th>학번</th><th>학생</th><th>학년/반</th><th>담임</th><th>거리</th><th>기록</th><th>달성률</th><th></th></tr></thead><tbody>'+f.map(function(s){var d2=dt(s.s),w2=wc(s.s),p2=pr(s.s),clr=CC[s.c]||'var(--accent)';return '<tr><td><span style="font-family:Outfit;font-weight:600;color:var(--text2);font-size:12px">'+s.s+'</span></td><td><div class="student-name-cell"><div class="mini-avatar" style="background:'+clr+'">'+s.n[0]+'</div><span style="font-weight:600">'+s.n+'</span></div></td><td><span class="grade-badge grade-'+s.g+'">'+s.g+'학년 '+s.c+'</span></td><td style="color:var(--text2)">'+s.t+'</td><td><span style="font-family:Outfit;font-weight:600;color:var(--accent2)">'+d2.toFixed(1)+'km</span></td><td><span style="font-family:Outfit;font-weight:600">'+w2+'주</span></td><td><div class="inline-progress"><div class="inline-progress-bar"><div class="inline-progress-fill" style="width:'+p2+'%;background:'+(p2>=100?'var(--green)':'var(--accent)')+'"></div></div><span class="inline-progress-text" style="color:'+(p2>=100?'var(--green)':'var(--text2)')+'">'+p2+'%</span></div></td><td><button class="btn-icon" onclick="vS(\''+s.s+'\')" title="상세보기">👁</button></td></tr>'}).join('')+'</tbody></table></div>'+(f.length===0?'<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:36px;margin-bottom:8px">🔍</div>검색 결과가 없습니다</div>':'')+'</div><div class="chart-container"><h3>반별 평균 달성률</h3><div class="group-cards">'+CL.map(function(c){var cs=all.filter(function(s){return s.c===c});var ap=cs.length?Math.round(cs.reduce(function(a,s){return a+pr(s.s)},0)/cs.length):0;return '<div class="group-card"><div style="font-size:14px;font-weight:700;margin-bottom:8px">'+c+'</div><div style="font-family:Outfit;font-size:24px;font-weight:800;color:'+CC[c]+'">'+ap+'%</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+cs.length+'명</div><div class="progress-bar-bg" style="margin-top:8px"><div class="progress-bar-fill" style="width:'+Math.min(ap,100)+'%;background:'+CC[c]+'"></div></div></div>'}).join('')+'</div></div><div class="chart-container"><h3>학년별 평균 달성률</h3><div class="group-cards">'+[6,7,8,9,10,11].map(function(g2,i){var gs=all.filter(function(s){return s.g===g2});var ap=gs.length?Math.round(gs.reduce(function(a,s){return a+pr(s.s)},0)/gs.length):0;return '<div class="group-card"><div style="font-size:14px;font-weight:700;margin-bottom:8px">'+g2+'학년</div><div style="font-family:Outfit;font-size:24px;font-weight:800;color:'+BC[i%BC.length]+'">'+ap+'%</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+gs.length+'명</div><div class="progress-bar-bg" style="margin-top:8px"><div class="progress-bar-fill" style="width:'+Math.min(ap,100)+'%;background:'+BC[i%BC.length]+'"></div></div></div>'}).join('')+'</div></div></div>'}
+function vS(sid){LI=sid;MODE='student';render()}
+DB=initDB();render();
+</script>
+</body>
+</html>
